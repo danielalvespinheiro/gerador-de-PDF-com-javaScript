@@ -1,77 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
-    <title>Gerar PDF com Imagem Pequena</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+        <title>Gerar PDF com Imagem Pequena</title>
+    </head>
+    <body>
     <label for="input1">Exemplo name:</label>
     <input type="text" id="input1">
 
     <label for="input2">Exemplo subName:</label>
     <input type="text" id="input2">
-
+    
+    <label for="input3">Telefone:</label>
+    <input type="text" id="input3">
+    
+    <label for="input4">Email:</label>
+    <input type="text" id="input4">
+    
+    
     <button onclick="criarPdf()">Visualizar</button>
-
+    
     <script>
         function criarPdf() {
             var doc = new jsPDF('p', 'mm', 'a4');
-            var fontSize = 14;
-
+            var fontSize = 12;
+            
             // URL da imagem
             var imgBase64 = 'http://localhost:3000/static/media/logo-prefeitura.284672139578226c1dd5.png';
-
+            
             var img = new Image();
             img.src = imgBase64;
-
+            
             img.onload = function() {
                 var pageSize = doc.internal.pageSize;
                 var pageWidth = pageSize.width;
                 var pageHeight = pageSize.height;
 
                 // Definir largura desejada para a imagem (por exemplo, 50 mm)
-                var desiredWidth = 50; // Em milímetros
+                var desiredWidth = 25; // Em milímetros
 
                 // Calcular proporções da imagem
                 var aspectRatio = this.width / this.height;
                 var imgWidth = desiredWidth;
                 var imgHeight = imgWidth / aspectRatio;
-
+                
                 // Calcular posição centralizada da imagem
                 var imgX = (pageWidth - imgWidth) / 2;
                 var imgY = 20; // Posição acima do texto "Test"
-
+                
                 // Adicionar imagem ao documento
                 doc.addImage(this, 'PNG', imgX, imgY, imgWidth, imgHeight);
-
+                
                 // Adicionar texto "Test" abaixo da imagem
                 var textoTopo = "Test";
                 var textoTopoWidth = doc.getStringUnitWidth(textoTopo) * fontSize / doc.internal.scaleFactor;
                 var textoTopoX = (pageWidth - textoTopoWidth) / 2;
                 doc.setFontSize(fontSize);
-                doc.text(textoTopoX, imgY + imgHeight + 10, textoTopo);
+                doc.text(textoTopoX, imgY + imgHeight + 35, textoTopo);
 
                 // Adicionar inputs personalizados abaixo do texto "Test"
                 var input1 = document.getElementById('input1').value;
                 var input2 = document.getElementById('input2').value;
+                var input3 = document.getElementById('input3').value;
+                var input4 = document.getElementById('input4').value; 
 
-                // Calcular posição vertical para os inputs
-                var input1Y = imgY + imgHeight + 20; // 20 unidades abaixo do texto "Test"
-                var input2Y = input1Y + 10; // Espaçamento entre os inputs
+                // Calcular altura total dos inputs
+                var totalInputsHeight = 4 * 10 + 3 * 10; // 4 inputs com 10 unidades de altura cada e 3 espaçamentos de 10 unidades
+                var inputsStartY = (pageHeight - totalInputsHeight) / 2; // Posição Y inicial dos inputs
 
-                doc.text(input1, 10, input1Y);
-                doc.text(input2, 10, input2Y);
+                // Adicionar os inputs centralizados
+                doc.text(input1, 10, inputsStartY);
+                doc.text(input2, 10, inputsStartY + 10); // 10 unidades abaixo do primeiro input
+                doc.text(input3, 10, inputsStartY + 20); // 20 unidades abaixo do segundo input
+                doc.text(input4, 10, inputsStartY + 30); // 30 unidades abaixo do terceiro input
 
-                // Adicionar texto "Data" no rodapé centralizado
-                var textoFinal = "Data";
-                var textoFinalWidth = doc.getStringUnitWidth(textoFinal) * fontSize / doc.internal.scaleFactor;
-                var textoFinalX = (pageWidth - textoFinalWidth) / 2;
-                var textoFinalY = pageHeight - 10; // Posição acima do rodapé
-                doc.text(textoFinalX, textoFinalY, textoFinal);
+                var today = new Date();
+                var options = { month: 'long', day: 'numeric', year: 'numeric' };
+                var dateString = 'Em ' + today.toLocaleDateString('pt-BR', options) + '.';
+                var acurrentDate = dateString; // Use the formatted date string
+                var textoFinal = acurrentDate;
 
-                // Salvar o documento com o nome especificado
+                var smallerFontSize = 10;    
+
+                var textoFinalWidth = doc.getStringUnitWidth(textoFinal) * smallerFontSize / doc.internal.scaleFactor;
+                var margemInferior = 237; // Margem inferior para o rodapé
+                var margemDireita = 145; // Ajuste esta margem conforme necessário
+                var textoFinalX = margemDireita; // Posição à esquerda
+                var textoFinalY = pageHeight - margemInferior; // Ajuste vertical
+                doc.setFontSize(smallerFontSize);
+                doc.text(textoFinalX, textoFinalY, textoFinal); // Salvar o documento com o nome especificado
+
                 doc.save('documento.pdf');
             };
         }
