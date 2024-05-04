@@ -66,15 +66,34 @@
                 var input3 = document.getElementById('input3').value;
                 var input4 = document.getElementById('input4').value; 
 
-                // Calcular altura total dos inputs
                 var totalInputsHeight = 4 * 10 + 3 * 10; // 4 inputs com 10 unidades de altura cada e 3 espaçamentos de 10 unidades
-                var inputsStartY = (pageHeight - totalInputsHeight) / 2; // Posição Y inicial dos inputs
+
+                var pageWidth = doc.internal.pageSize.width;
+                var pageHeight = doc.internal.pageSize.height;
+
+                var inputsStartY = 100;
+
+                var inputText = [input1, input2, input3, input4];
+                var inputTextWidth = 169;
+
+                for (var i = 0; i < inputText.length; i++) {
+                    var text = inputText[i];
+                    var lines = doc.splitTextToSize(text, inputTextWidth);
+                    for (var j = 0; j < lines.length; j++) {
+                        doc.text(10, inputsStartY, lines[j]);
+                        inputsStartY += 10;
+                        if (inputsStartY > pageHeight - 20) {
+                        doc.addPage();
+                        inputsStartY = 50;
+                        }
+                    }
+                }
+               // doc.text(input1, 10, inputsStartY);
+               // doc.text(input2, 10, inputsStartY + 10); // 10 unidades abaixo do primeiro input
+               // doc.text(input3, 10, inputsStartY + 20); // 20 unidades abaixo do segundo input
+               // doc.text(input4, 10, inputsStartY + 30); // 30 unidades abaixo do terceiro input
 
                 // Adicionar os inputs centralizados
-                doc.text(input1, 10, inputsStartY);
-                doc.text(input2, 10, inputsStartY + 10); // 10 unidades abaixo do primeiro input
-                doc.text(input3, 10, inputsStartY + 20); // 20 unidades abaixo do segundo input
-                doc.text(input4, 10, inputsStartY + 30); // 30 unidades abaixo do terceiro input
 
                 var today = new Date();
                 var options = { month: 'long', day: 'numeric', year: 'numeric' };
