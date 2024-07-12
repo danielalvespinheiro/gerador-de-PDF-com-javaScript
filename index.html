@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
-        <title>Gerar PDF com Imagem Pequena</title>
-    </head>
-    <body>
-    <label for="input1">Exemplo name:</label>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+    <title>Gerar PDF com Imagem Pequena</title>
+</head>
+<body>
+    <label for="input1">Assunto:</label>
     <input type="text" id="input1">
 
-    <label for="input2">Exemplo subName:</label>
+    <label for="input2">Sub-nome</label>
     <input type="text" id="input2">
     
     <label for="input3">Telefone:</label>
@@ -18,13 +18,21 @@
     
     <label for="input4">Email:</label>
     <input type="text" id="input4">
-    
+
+    <label for="input5">Texto:</label>
+    <textarea type="text" id="input5"></textarea>
+
+    <label for="input6">Outro:</label>
+    <textarea type="text" id="input6"></textarea>
     
     <button onclick="criarPdf()">Visualizar</button>
     
     <script>
+
         function criarPdf() {
+            
             var doc = new jsPDF('p', 'mm', 'a4');
+            
             var fontSize = 12;
             
             // URL da imagem
@@ -37,7 +45,7 @@
                 var pageSize = doc.internal.pageSize;
                 var pageWidth = pageSize.width;
                 var pageHeight = pageSize.height;
-
+                
                 // Definir largura desejada para a imagem (por exemplo, 50 mm)
                 var desiredWidth = 25; // Em milímetros
 
@@ -48,72 +56,101 @@
                 
                 // Calcular posição centralizada da imagem
                 var imgX = (pageWidth - imgWidth) / 2;
-                var imgY = 20; // Posição acima do texto "Test"
+                var imgY = 10; // Posição acima do texto "Test"
                 
-                // Adicionar imagem ao documento
-                doc.addImage(this, 'PNG', imgX, imgY, imgWidth, imgHeight);
+                // Adicionar imagem em cada página
+                doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+
+                // Calcular a posição e o tamanho da data
+                var smallerFontSize = 10;    
+                var todayElement = document.getElementById('today'); // Elemento onde será exibida a data
+                var today = new Date();
+                var options = { month: 'long', day: 'numeric', year: 'numeric' };
+                var dateString = 'Em ' + today.toLocaleDateString('pt-BR', options) + '.';
+                var textoFinal = dateString; // Use the formatted date string
+
+                var textoFinalWidth = doc.getStringUnitWidth(textoFinal) * smallerFontSize / doc.internal.scaleFactor;
+                var margemInferior = 10; // Margem inferior para o rodapé
+                var margemDireita = 30; // Ajuste esta margem conforme necessário
+                var textoFinalX = pageWidth - margemDireita - textoFinalWidth; // Posição à direita
+                var textoFinalY = imgY + imgHeight + 10; // Posição ao lado da imagem
+                doc.setFontSize(smallerFontSize);
+                doc.text(textoFinalX, textoFinalY, textoFinal); // Adiciona a data ao PDF
                 
                 // Adicionar texto "Test" abaixo da imagem
-                var textoTopo = "Test";
-                var textoTopoWidth = doc.getStringUnitWidth(textoTopo) * fontSize / doc.internal.scaleFactor;
-                var textoTopoX = (pageWidth - textoTopoWidth) / 2;
+                var input5 = document.getElementById('input5').value;
+                var input5Width = doc.getStringUnitWidth(input5) * fontSize / doc.internal.scaleFactor;
+                var input5X = (pageWidth - input5Width) / 7;
                 doc.setFontSize(fontSize);
-                doc.text(textoTopoX, imgY + imgHeight + 35, textoTopo);
+                var input5Lines = doc.splitTextToSize(input5, pageWidth - 90); // Calcula o texto em várias linhas
+                var input5Height = input5Lines.length * 5; // Altura total do texto
+                doc.text(10, imgY + imgHeight + 15, input5Lines); // Adiciona o texto em várias linhas
 
-                // Adicionar inputs personalizados abaixo do texto "Test"
-                var input1 = document.getElementById('input1').value;
-                var input2 = document.getElementById('input2').value;
-                var input3 = document.getElementById('input3').value;
-                var input4 = document.getElementById('input4').value; 
+                // Calcular a posição vertical para input6
+                var input6Y = imgY + imgHeight + 15 + input5Height + 20; // 20 unidades abaixo do texto input5
 
-                var totalInputsHeight = 4 * 10 + 3 * 10; // 4 inputs com 10 unidades de altura cada e 3 espaçamentos de 10 unidades
+                var input6 = document.getElementById('input6').value;
+                var input6Width = doc.getStringUnitWidth(input6) * fontSize / doc.internal.scaleFactor;
+                var input6X = (pageWidth - input5Width) / 7;
+                doc.setFontSize(fontSize);
+                var input6Lines = doc.splitTextToSize(input6, pageWidth - 90); // Calcula o texto em várias linhas
+                var input6Height = input6Lines.length * 3; // Altura total do texto
+                doc.text(10, input6Y, input6Lines); // Adiciona o texto em várias linhas
 
-                var pageWidth = doc.internal.pageSize.width;
-                var pageHeight = doc.internal.pageSize.height;
+                // Ajuste a altura total dos inputs para considerar input5 e input6
+                var totalInputsHeight = 4 * 10 + 3 * 10 + input5Height + input6Height; // 4 inputs com 10 unidades de altura cada, 3 espaçamentos de 10 unidades, altura do input5 e altura do input6
 
                 var inputsStartY = 100;
 
-                var inputText = [input1, input2, input3, input4];
+                const inputText = [
+                 
+
+                  {name: 'Assunto', value: input1},
+                  {value: input2}, // Removido o nome para o segundo input
+                  {name: 'Telefone', value: input3},
+                  {name: 'Email', value: input4}
+
+                ];
+
+                const inputValue = [
+                document.getElementById('input1').value,
+                document.getElementById('input2').value,
+                document.getElementById('input3').value,
+                document.getElementById('input4').value,
+                ];
+
+                const inputNames = ['Assunto', '', 'Telefone', 'Email'];
+
                 var inputTextWidth = 169;
 
                 for (var i = 0; i < inputText.length; i++) {
-                    var text = inputText[i];
+                    const text = `${inputNames[i]}: ${inputValue[i]}`;
                     var lines = doc.splitTextToSize(text, inputTextWidth);
                     for (var j = 0; j < lines.length; j++) {
                         doc.text(10, inputsStartY, lines[j]);
                         inputsStartY += 10;
                         if (inputsStartY > pageHeight - 20) {
-                        doc.addPage();
-                        inputsStartY = 50;
+                            doc.addPage();
+                            inputsStartY = 50;
                         }
                     }
                 }
-               // doc.text(input1, 10, inputsStartY);
-               // doc.text(input2, 10, inputsStartY + 10); // 10 unidades abaixo do primeiro input
-               // doc.text(input3, 10, inputsStartY + 20); // 20 unidades abaixo do segundo input
-               // doc.text(input4, 10, inputsStartY + 30); // 30 unidades abaixo do terceiro input
 
-                // Adicionar os inputs centralizados
-
-                var today = new Date();
-                var options = { month: 'long', day: 'numeric', year: 'numeric' };
-                var dateString = 'Em ' + today.toLocaleDateString('pt-BR', options) + '.';
-                var acurrentDate = dateString; // Use the formatted date string
-                var textoFinal = acurrentDate;
-
-                var smallerFontSize = 10;    
-
-                var textoFinalWidth = doc.getStringUnitWidth(textoFinal) * smallerFontSize / doc.internal.scaleFactor;
-                var margemInferior = 237; // Margem inferior para o rodapé
-                var margemDireita = 145; // Ajuste esta margem conforme necessário
-                var textoFinalX = margemDireita; // Posição à esquerda
-                var textoFinalY = pageHeight - margemInferior; // Ajuste vertical
-                doc.setFontSize(smallerFontSize);
-                doc.text(textoFinalX, textoFinalY, textoFinal); // Salvar o documento com o nome especificado
-
+                // Salvar o documento com o nome especificado
                 doc.save('documento.pdf');
             };
         }
+
+        // Adicione ouvintes de eventos para cada campo de entrada para capturar a tecla "Enter"
+        ['input1', 'input2', 'input3', 'input4', 'input5', 'input6'].forEach(function(id) {
+            document.getElementById(id).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    this.value += '\n'; // Adiciona uma quebra de linha
+                    e.preventDefault(); // Impede o comportamento padrão da tecla "Enter" (submeter formulário).
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
