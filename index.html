@@ -36,10 +36,10 @@
             var fontSize = 12;
             
             // URL da imagem
-            var imgBase64 = 'http://localhost:3000/static/media/logo-prefeitura.284672139578226c1dd5.png';
-            
+            var imgSrc = 'img/test.png';
+
             var img = new Image();
-            img.src = imgBase64;
+            img.src = imgSrc;
             
             img.onload = function() {
                 var pageSize = doc.internal.pageSize;
@@ -106,7 +106,7 @@
                  
 
                   {name: 'Assunto', value: input1},
-                  {value: input2}, // Removido o nome para o segundo input
+                  {name: 'Sub-nome', value: input2}, // Removido o nome para o segundo input
                   {name: 'Telefone', value: input3},
                   {name: 'Email', value: input4}
 
@@ -119,7 +119,7 @@
                 document.getElementById('input4').value,
                 ];
 
-                const inputNames = ['Assunto', '', 'Telefone', 'Email'];
+                const inputNames = ['Assunto', 'Sub-nome', 'Telefone', 'Email'];
 
                 var inputTextWidth = 169;
 
